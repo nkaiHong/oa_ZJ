@@ -1,0 +1,31 @@
+# 配置Spring Boot，所有依赖此组件的其他组件，都使用相同的配置。
+# 如果有些组件，不使用相同的配置，那么就自己增加application.yaml文件。
+spring:
+   mvc.view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+   servlet multipart:
+      maxFileSize: 10MB
+   # 数据源的配置
+   datasource:
+      driverClassName: com.mysql.jdbc.Driver
+      url: jdbc:mysql://127.0.0.1:3306/oa
+      username: root
+      password: qwe123
+
+   # JPA配置
+   jpa:
+      #database-platform: MySQL57
+      #showSql: true
+      hibernate:
+         # 属性的名称为ddlAuto，可以直接使用ddlAuto名称，也可以把字母全改为小写，使用减号隔开
+         ddl-auto: update
+      properties:
+         # Hibernate的方言参考官方的hibernate.cfg.xml文件中的配置
+         hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
+      # 在一个请求里面打开一个EntityManager，这样可以让实体对象传递给JSP以后，还能够使用懒加载
+      # 如果EntityManager被关闭，页面上肯定不能使用懒加载从数据库加载关联数据
+      openInView: true
+   message:
+      basename: org.fkjava.security.messages
+fkjava.storage.dir: D:\\my java ee

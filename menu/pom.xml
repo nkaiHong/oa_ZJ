@@ -1,0 +1,57 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.fkjava</groupId>
+    <artifactId>oa</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>menu</artifactId>
+  
+ <!-- 加入用户、角色模块，并且把关联的其他依赖也加入 -->
+  	<dependencies>
+	  	<dependency>
+	  			<groupId>org.fkjava</groupId>
+				<artifactId>identity</artifactId>
+				<version>${project.version}</version>
+	  	</dependency>
+	  	
+	  	<dependency>
+	  			<groupId>org.fkjava.common</groupId>
+				<artifactId>data</artifactId>
+				<version>${project.version}</version>
+	  	</dependency>
+	  	
+  	
+  		<!-- 加入Servlet API的依赖 -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<!-- Tomcat自带的，不要打包 -->
+			<scope>provided</scope>
+		</dependency>
+		<!-- 激活完整版的Tomcat，支持JSP -->
+		<!-- 增加JSP支持 -->
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+			<!-- 如果在Tomcat里面运行，那么是由Tomcat提供的 -->
+			<!-- 如果在mvn命令直接运行，该依赖也会加入类路径 -->
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>5.1.47</version>
+	  </dependency>
+
+		<!-- 开发的时候使用的，用于自动部署、自动重启，修改的文件可以马上生效 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<!-- 可选的，必须设置为true，才能实现热部署 -->
+			<optional>true</optional>
+		</dependency>
+  </dependencies>
+</project>

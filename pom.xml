@@ -1,0 +1,46 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.1.0.RELEASE</version>
+  </parent>
+  <groupId>org.fkjava</groupId>
+  <artifactId>oa</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  
+  
+  <properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>10</java.version>
+		<!-- Java 9、Java 10需要加上下面的参数，否则服务使用JAXB -->
+		<!-- 如果有其他模块的依赖也无法使用，一样要加上依赖！ -->
+		<!-- 直接在Eclipse里面运行main方法的时候，需要把此参数加入到运行变量中 -->
+		<!-- mvn spring-boot:run -->
+		<!--<spring-boot.run.jvmArguments>&#45;&#45;add-modules java.xml.bind</spring-boot.run.jvmArguments> -->
+	</properties>
+	
+	<build>
+		<plugins>
+			<!-- 编译插件设置为3.8.0，才能使用Java 10和Java 11 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<!-- 如果Spring Boot版本比较旧，需要自己设置version为3.8.0 -->
+			</plugin>
+		</plugins>
+	</build>
+	<modules>
+		<module>common</module>
+		<module>identity</module>
+		<module>menu</module>
+		<module>layout</module>
+		<module>security</module>
+		<module>storage</module>
+		<module>notice</module>
+		<module>human-resource</module>
+		<module>workflow</module>
+	</modules>
+</project>

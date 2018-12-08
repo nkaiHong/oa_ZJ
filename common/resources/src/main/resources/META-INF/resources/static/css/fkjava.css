@@ -1,0 +1,92 @@
+@charset "UTF-8";
+
+.panel-heading .close {
+	opacity: 1;
+}
+
+.panel-heading .btn {
+	margin-top: -7px;
+}
+
+.panel-body {
+	padding-bottom: 0px;
+}
+
+.table {
+	margin-bottom: 0px;
+}
+
+.table nav {
+	margin-bottom: 0px;
+}
+
+.table nav ul {
+	margin-bottom: 0px;
+}
+
+.roles {
+	border: 1px solid #eee;
+	height: 140px;
+	overflow-y: scroll;
+}
+
+.roles ul {
+	padding-inline-start: 5px;
+}
+
+.roles li {
+	list-style: none;
+}
+
+.un{
+	padding-left: 20px;
+	padding-right: 20px;
+	margin-left: 0px;
+	left: 30px;
+}
+.wei{
+	left: 30px;
+}
+.but{
+	top:25px;
+	left:30px;
+}
+.tree-container {
+	height: 400px;
+	overflow: auto;
+	border-right: 1px solid #ddd;
+}
+
+.ztree li span.button.add {
+	margin-left: 2px;
+	margin-right: -1px;
+	background-position: -144px 0px;
+	vertical-align: top;
+	*vertical-align: middle
+}
+/* 自动完成的样式 开始*/
+.autocomplete-suggestions {
+	border: 1px solid #999;
+	background: #FFF;
+	overflow: auto;
+}
+ .autocomplete-suggestion {
+	padding: 2px 5px;
+	white-space: nowrap;
+	overflow: hidden;
+}
+ .autocomplete-selected {
+	background: #F0F0F0;
+}
+ .autocomplete-suggestions strong {
+	font-weight: normal;
+	color: #3399FF;
+}
+ .autocomplete-group {
+	padding: 2px 5px;
+}
+ .autocomplete-group strong {
+	display: block;
+	border-bottom: 1px solid #000;
+}
+/* 自动完成的样式 结束*/ 

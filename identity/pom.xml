@@ -1,0 +1,103 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.fkjava</groupId>
+    <artifactId>oa</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>identity</artifactId>
+  <name>identity</name>
+  <description>用户身份</description>
+  
+  
+  <dependencies>
+ 
+  	  <!-- 依赖通用配置组件 -->
+  	  <dependency>
+			<groupId>org.fkjava.common</groupId>
+			<artifactId>config</artifactId>
+			<version>${project.version}</version>
+	  </dependency>
+	  <!-- 增加对css的依赖-->
+  	  <dependency>
+			<groupId>org.fkjava.common</groupId>
+			<artifactId>resources</artifactId>
+			<version>${project.version}</version>
+	  </dependency>
+  	  <!-- 配置JPA -->
+	  <dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-data-jpa</artifactId>
+	  </dependency>
+	  
+	  <!-- 加入Spring MVC，并且配置好 -->
+	  <dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-web</artifactId>
+	  </dependency>
+	  
+	  <!-- 开发的时候使用的，用于自动部署、自动重启，修改的文件可以马上生效 -->
+	  <dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-devtools</artifactId>
+				<scope>runtime</scope>
+				<!-- 可选的，必须设置为true，才能实现热部署 -->
+				<optional>true</optional>
+	  </dependency>
+	  
+	  <!-- 数据库驱动 -->
+	  <dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>5.1.47</version>
+	  </dependency>
+	  
+	  <!-- 解决JAXB在Java 11里面被删除的问题 -->
+	  <dependency>
+				<groupId>javax.xml.bind</groupId>
+				<artifactId>jaxb-api</artifactId>
+	  </dependency>
+	  
+	  <!-- 加上以后，才不会提示JSTL相关的类找不到 -->
+	  <dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>jstl</artifactId>
+	  </dependency>
+	  
+	  <!-- 加入Servlet API的依赖 -->
+      <dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<!-- Tomcat自带的，不要打包 -->
+				<scope>provided</scope>
+	  </dependency>
+	  
+	  <!-- 激活完整版的Tomcat，支持JSP -->
+	  <!-- 增加JSP支持 -->
+      <dependency>
+				<groupId>org.apache.tomcat.embed</groupId>
+				<artifactId>tomcat-embed-jasper</artifactId>
+				<!-- 如果在Tomcat里面运行，那么是由Tomcat提供的 -->
+				<!-- 如果在mvn命令直接运行，该依赖也会加入类路径 -->
+				<scope>provided</scope>
+	  </dependency>
+	  
+	  <!-- 加入前端需要的webjars，就是一堆的css、js、字体、图片 www.webjars.com-->
+	  <dependency>
+				<groupId>org.webjars.bower</groupId>
+				<artifactId>bootstrap</artifactId>
+				<version>3.3.7</version>
+	  </dependency>
+	  
+	  <dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+		</dependency>
+		<!-- 使用SCrypt算法加密 -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.60</version>
+		</dependency>
+  </dependencies>
+</project>
