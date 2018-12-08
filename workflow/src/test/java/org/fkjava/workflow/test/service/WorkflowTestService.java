@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -15,6 +17,7 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.fkjava.common.data.domain.Result;
 import org.fkjava.workflow.WorkflowConfig;
 import org.fkjava.workflow.service.WorkflowService;
+import org.fkjava.workflow.vo.ProcessForm;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,17 +25,23 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.StringUtils;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {WorkflowConfig.class})
-public class WorkflowTestService extends AbstractJUnit4SpringContextTests{
+//AbstractJUnit4SpringContextTests 没有事务，测试的数据直接同步到数据库
+//AbstractTransactionalJUnit4SpringContextTests 有事务，会在测试方法完成以后回滚事务 ，避免污染测试数据库
+public class WorkflowTestService 
+//extends AbstractJUnit4SpringContextTests
+extends AbstractTransactionalJUnit4SpringContextTests{
 
 	@Autowired
 	private WorkflowService workflowService;
+	private String processDefinitionId;
 	
-	@Test
+	@Before
 	public void testDeploySuccess() throws IOException, URISyntaxException {
 		String name="helloworld";
 		
@@ -49,6 +58,12 @@ public class WorkflowTestService extends AbstractJUnit4SpringContextTests{
 		try(InputStream in = new ByteArrayInputStream(outputStream.toByteArray())){
 			Result result = this.workflowService.deploy(name,in);
 			Assert.assertEquals(Result.CODE_OK, result.getCode());
+		}
+		
+		
+		ProcessDefinition definition = this.workflowService.findDefinitionByKey(name);
+		if(!StringUtils.isEmpty(definition)) {
+		processDefinitionId = definition.getId();
 		}
 	}
 
@@ -72,14 +87,7 @@ public class WorkflowTestService extends AbstractJUnit4SpringContextTests{
 		Assert.assertEquals("预期要有数据，总记录数要大于0", true,page.getTotalElements() > 0);
 	}
 	
-	String processDefinitionId;
 	
-	@Before
-	public void findDefinitionByKey() {
-		String key="helloworld";
-		ProcessDefinition definition = this.workflowService.findDefinitionByKey(key);
-		processDefinitionId = definition.getId();
-	}
 	
 	@Test
 	public void disable() {
@@ -103,5 +111,27 @@ public class WorkflowTestService extends AbstractJUnit4SpringContextTests{
 		Assert.assertNotNull(definition);
 		//isSuspended:流程实例是否停止
 		Assert.assertEquals(false, definition.isSuspended());
+	}
+	
+	@Test
+	public void start() {
+		String key = "helloworld";
+		// 把表单显示在页面，然后页面填写完成以后，提交到控制器。有控制器启动调用业务逻辑启动实例
+		// 一个流程定义，有很多的流程实例。
+		ProcessForm form = this.workflowService.findDifitionByKey(key);
+		Assert.assertNotNull(form);
+		
+		// 启动流程实例
+		// 用户填写的数据，没有流程都不同，所以此时只能获取所有的请求参数，交给业务逻辑层的统一代码去处理
+		// request.getParameterMap()返回一个Map，现在这里模拟一个。
+		Map<String, String[]> params = new HashMap<>();
+		// 根据流程定义的ID来启动流程实例
+		String processDefinitionId = form.getDefinition().getId();
+		System.out.println("开始启动流程引擎实例");
+		Result result = this.workflowService.start(processDefinitionId,params);
+		System.out.println("流程引擎实例启动结束");
+		Assert.assertNotNull(result);
+		System.out.println(result.getCode());
+		Assert.assertEquals(Result.CODE_OK, result.getCode());
 	}
 }
