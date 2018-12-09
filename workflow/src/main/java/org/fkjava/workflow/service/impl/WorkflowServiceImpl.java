@@ -3,21 +3,32 @@ package org.fkjava.workflow.service.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipInputStream;
 
 import org.activiti.engine.FormService;
+import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.form.FormData;
 import org.activiti.engine.form.StartFormData;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskQuery;
 import org.fkjava.common.data.domain.Result;
+import org.fkjava.identity.UserHolder;
+import org.fkjava.identity.domain.User;
+import org.fkjava.identity.service.IdentityService;
 import org.fkjava.workflow.service.WorkflowService;
 import org.fkjava.workflow.vo.ProcessForm;
+import org.fkjava.workflow.vo.TaskForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +50,14 @@ public class WorkflowServiceImpl implements WorkflowService{
 	private FormService formService;
 	@Autowired
 	private RuntimeService runtimeService;
+	@Autowired
+	private TaskService taskService;
+	@Autowired
+	private HistoryService historyService;
+	@Autowired
+	private IdentityService identityService;
+	
+	
 	@Override
 	public Result deploy(String name, InputStream in) {
 		// 解压缩，里面会包含bpmn、png，甚至有一些其他的文件
@@ -199,5 +218,138 @@ public class WorkflowServiceImpl implements WorkflowService{
 	private String saveBusinessDate(ProcessDefinition definition, Map<String, Object> variables) {
 		// TODO 暂时不保存业务数据
 		return null;
+	}
+
+	@Override
+	public Page<TaskForm> findTasks(String keyword, String processInstanceId, int pageNumber) {
+		User user = UserHolder.get();
+		Pageable pageable = PageRequest.of(pageNumber, 10);
+		
+		//1.根据当前的用户查询待办任务列表，并且分页查询
+		TaskQuery taskQuery = this.taskService.createTaskQuery()
+				.orderByTaskCreateTime().desc(); // 按时间倒序，最新收到放前面
+		
+		if(user != null) {
+			// 如果用户不为空，查询当前用户的待办任务
+			taskQuery.taskAssignee(user.getId());
+		}
+		
+		if(!StringUtils.isEmpty(keyword)) {
+			keyword = "%" + keyword + "%";
+			//有关键字则使用用户的名称来进行关键字模糊查询
+			taskQuery.taskNameLike(keyword);
+		}
+		
+		if(!StringUtils.isEmpty(processInstanceId)) {
+			//如果有传入流程实例的id，则根据流程实例进行查询待办
+			taskQuery.processInstanceId(processInstanceId);
+		}
+		
+		if(!StringUtils.isEmpty(processInstanceId)) {
+			//如果有传入流程实例的ID，则根据流程实例查询待办
+			taskQuery.processInstanceId(processInstanceId);
+		}
+		
+		//查询总数
+		Long total = taskQuery.count();
+		//查询上一页的数据
+		List<Task> taskList = taskQuery.listPage((int) pageable.getOffset(), pageable.getPageSize());
+		// 2.根据得到的任务列表，需要把结果封装成TaskForm对象
+		List<TaskForm> content = new LinkedList<>();
+		taskList.forEach(task ->{
+			TaskForm tf = this.convert2TaskForm(task);
+			content.add(tf);
+		});
+		
+		Page<TaskForm> page = new PageImpl<>(content,pageable,total);
+		return page;
+	}
+
+	private TaskForm convert2TaskForm(Task task) {
+		TaskForm tf = new TaskForm();
+		tf.setTask(task);
+		// 3.查询任务对应的流程实例
+		HistoricProcessInstance instance = this.historyService.createHistoricProcessInstanceQuery()
+				.processInstanceId(task.getProcessInstanceId())
+				.singleResult();
+		tf.setInstance(instance);
+		
+		// 4.查询流程实例的创始人
+		// 默认是没有StartUserId的，必须要在启动流程实例之前，把当前用户告诉流程引擎
+		// 通常是增加一个拦截器，再调用Activiti里面的一个静态方法来设置
+		// Authentication.setAuthenticatedUserId(authenticatedUserId);
+		User initialUser = this.identityService.findUserById(instance.getStartUserId());
+		tf.setInitialUser(initialUser);
+		
+		// 5.查询任务对应的流程定义
+		ProcessDefinition definition = this.findDefinitionById(task.getProcessDefinitionId());
+		tf.setDefinition(definition);
+		return tf;
+	}
+
+	@Override
+	public TaskForm getTaskForm(String taskId) {
+		Task task = this.taskService.createTaskQuery().taskId(taskId).singleResult();
+		TaskForm tf = this.convert2TaskForm(task);
+		
+		//表单内容
+		Object content;
+		try{
+				content = this.formService.getRenderedTaskForm(taskId);
+		}catch (Exception e) {
+			//出现异常，表示没有表单
+			content = null;
+		}
+		//表单数据
+		FormData formData = this.formService.getTaskFormData(taskId);
+		//表单的名称
+		String formKey = this.formService.getTaskFormKey(tf.getDefinition().getId(), task.getTaskDefinitionKey());
+		
+		tf.setContent(content);
+		tf.setFormData(formData);
+		tf.setFormKey(formKey);
+		return tf;
+	}
+
+	@Override
+	public void complete(String taskId, Map<String, String[]> params) {
+		//1.获取当前的用户
+		User user = UserHolder.get();
+		// 2.整理请求参数，跟启动流程实例一样
+		Map<String, Object> variables = new HashMap<>();
+		
+		params.forEach((key,value) ->{
+			if(value.length == 1) {
+				//只有一个值
+				variables.put(key, value[0]);
+			}else {
+				//有多个值
+				variables.put(key, value);
+			}
+		});
+		
+		// 3.获取remark参数的值，备注不需要传入流程引擎
+		// remove方法是把key对应的键值对删除，返回key对应的值
+		Object tmp = variables.remove("remark");
+		String remark = tmp != null ? tmp.toString() : null;
+		// 4.查询任务的实例，只要Task对象
+		Task task = this.taskService.createTaskQuery().taskId(taskId).singleResult();
+		//5.判断处理人是否为当前用户，如果不是则抛出异常
+		if(!task.getAssignee().equals(user.getId())) {
+			throw new IllegalArgumentException("非法请求：当前用户和任务的处理人不同！");
+		}
+		
+		// 6.查询流程定义
+		ProcessDefinition definition = this.findDefinitionById(task.getProcessDefinitionId());
+		// 7.查询流程实例
+		ProcessInstance instance = this.runtimeService.createProcessInstanceQuery()
+				.processInstanceId(task.getProcessInstanceId())
+				.singleResult();
+		
+		// 8.完成任务，核心代码
+		this.taskService.complete(taskId,variables);
+		
+		// 9.保存流程跟踪信息
+		this.SaveProcessTrace(definition, instance, remark);
 	}
 }

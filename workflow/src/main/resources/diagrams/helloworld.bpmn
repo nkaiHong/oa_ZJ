@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="测试">
   <process id="helloworld" name="你好，世界" isExecutable="true">
-    <startEvent id="startevent1" name="Start"></startEvent>
-    <userTask id="usertask1" name="任务名称"></userTask>
+    <documentation>深刻的积分拉屎咖啡硫酸钠氯化石蜡空间大福利收到流口水的离开麻烦了十多年阿克苏的你看见谁看见啊功能可适当爱了是你的乐观锁了</documentation>
+    <startEvent id="startevent1" name="Start" activiti:formKey="helloworld-task.html"></startEvent>
+    <userTask id="usertask1" name="任务名称" activiti:assignee="用户1" activiti:formKey="helloworld-task.html"></userTask>
     <sequenceFlow id="flow2" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
     <sequenceFlow id="flow3" sourceRef="usertask1" targetRef="exclusivegateway1"></sequenceFlow>
-    <userTask id="usertask2" name="任务一"></userTask>
+    <userTask id="usertask2" name="任务一" activiti:candidateGroups="用户组1，用户组2"></userTask>
     <sequenceFlow id="flow4" sourceRef="exclusivegateway1" targetRef="usertask2" skipExpression="参数等于b的时候">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${aaa eq 'b' }]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${ 参数 eq 'b' }]]></conditionExpression>
     </sequenceFlow>
-    <userTask id="usertask3" name="任务二"></userTask>
+    <userTask id="usertask3" name="任务二" activiti:candidateUsers="用户2，用户3"></userTask>
     <sequenceFlow id="flow5" sourceRef="exclusivegateway1" targetRef="usertask3"></sequenceFlow>
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="flow6" sourceRef="usertask3" targetRef="endevent1"></sequenceFlow>
