@@ -80,7 +80,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 		
 		// 此时DaoAuthenticationProvider不会被Spring容器管理，而是直接注入到AuthenticationManagerBuilder里面
 		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-		provider.setHideUserNotFoundExceptions(false);
+		provider.setHideUserNotFoundExceptions(false);	
 		provider.setUserDetailsService(securityService);
 		provider.setPasswordEncoder(passwordEncoder);
 		

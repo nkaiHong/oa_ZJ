@@ -20,7 +20,7 @@ public class NoticeType implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(generator="uuid2")
+	@GeneratedValue(generator="uuid2	")
 	@GenericGenerator(name="uuid2",strategy="uuid2")
 	@Column(length=36)
 	private String id;

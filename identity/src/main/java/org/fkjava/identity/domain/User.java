@@ -22,7 +22,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 
 @Entity
-@Table(name="oa_user")
+@Table(name="id_user")
 public class User implements Serializable{
 	
 	/**
@@ -46,7 +46,7 @@ public class User implements Serializable{
 	
 	@ManyToMany(fetch=FetchType.EAGER)//级联操作  查询用户的时候，把角色也查询出来
 	//多对多需要中间表来维护
-	@JoinTable(name="oa_user_roles",
+	@JoinTable(name="user_roles",
 	// user_id在id_user_roles表里面，指向、引用id_user表的id列
 	joinColumns = {@JoinColumn(name="user_id")},//表示user对象的外键
 	inverseJoinColumns = {@JoinColumn(name="role_id")})// 通过Role找到User的时候使用的key

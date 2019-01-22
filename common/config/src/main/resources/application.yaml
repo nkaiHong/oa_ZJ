@@ -11,7 +11,7 @@ spring:
       driverClassName: com.mysql.jdbc.Driver
       url: jdbc:mysql://127.0.0.1:3306/oa
       username: root
-      password: qwe123
+      password: 1234
 
    # JPA配置
    jpa:
@@ -22,7 +22,7 @@ spring:
          ddl-auto: update
       properties:
          # Hibernate的方言参考官方的hibernate.cfg.xml文件中的配置
-         hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
+         hibernate.dialect: org.hibernate.dialect.MySQL57Dialect
       # 在一个请求里面打开一个EntityManager，这样可以让实体对象传递给JSP以后，还能够使用懒加载
       # 如果EntityManager被关闭，页面上肯定不能使用懒加载从数据库加载关联数据
       openInView: true
